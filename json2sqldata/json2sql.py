@@ -1,38 +1,59 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
+import os
+import json
 
-dbname = 'database.db'
 
-conn = sqlite3.connect(dbname)
-c = conn.cursor()
+def mkcmd(tabele_name, data, autoid=False):
+	try:data=data[0]
+	except:raise(Exception("input data as list. \nactual: %s"%(type(data))))
 
-# executeメソッドでSQL文を実行する
-create_table = '''create table users (id int, name varchar(64),
-                  age int, gender varchar(32))'''
-c.execute(create_table)
+	cmd=[]
+	if autoid:
+		cmd.append("id integer primary key autoincrement")
+	for key,value in data.items():
+		cmd_one = str(key)
+		if type(value)==type(0):
+			cmd_one+= " int"
+		if type(value)==type(0.):
+			cmd_one+= " float"
+		if type(value)==type(u""):
+			cmd_one+= " text"
+		if type(value)==type([]):
+			cmd_one+= " sqlist"
 
-# SQL文に値をセットする場合は，Pythonのformatメソッドなどは使わずに，
-# セットしたい場所に?を記述し，executeメソッドの第2引数に?に当てはめる値を
-# タプルで渡す．
-sql = 'insert into users (id, name, age, gender) values (?,?,?,?)'
-user = (1, 'Taro', 20, 'male')
-c.execute(sql, user)
+		cmd.append(cmd_one)
+		resistration_cmd="create table if not exists %s ("%tabele_name + ", ".join(cmd) + ")"
+		insert_cmd = "insert into" + " %s "%tabele_name +  "(%s)"%", ".join(data.keys()) + " values " + "(%s)"%",".join(["?"]*len(data))
+		sort_index=data.keys()
+	return  resistration_cmd,insert_cmd,sort_index
 
-# 一度に複数のSQL文を実行したいときは，タプルのリストを作成した上で
-# executemanyメソッドを実行する
-insert_sql = 'insert into users (id, name, age, gender) values (?,?,?,?)'
-users = [
-    (2, 'Shota', 54, 'male'),
-    (3, 'Nana', 40, 'female'),
-    (4, 'Tooru', 78, 'male'),
-    (5, 'Saki', 31, 'female')
-]
-c.executemany(insert_sql, users)
-conn.commit()
+def register_data(tabele_name, database_name, data, autoid=True):
+	sqlite3.register_adapter(list, lambda l: ';'.join([str(i) for i in l]))
+	sqlite3.register_converter("sqlist", lambda s: [(i) for i in s.split(';')])
+	con = sqlite3.connect(database_name,detect_types = sqlite3.PARSE_DECLTYPES)
+	con.row_factory = sqlite3.Row
 
-select_sql = 'select * from users'
-for row in c.execute(select_sql):
-    print(row)
+	create_table, insert_sql, sort=  mkcmd(tabele_name, data, autoid)
+	con.execute(create_table)
+	content = [j_one.values() for j_one in data]
+	con.executemany(insert_sql,content)
+	con.commit()
 
-conn.close()
+def load_data(tabele_name, database_name):
+	con = sqlite3.connect(database_name,detect_types = sqlite3.PARSE_DECLTYPES)
+	con.row_factory = sqlite3.Row
+	cur = con.cursor()
+	select_sql = 'select * from %s'%tabele_name
+	cur.execute(select_sql)
+	return cur.fetchall()
+
+if __name__ == "__main__":[
+	dbname = 'database.db'
+	# os.remove(dbname)
+	j=json.load(open("../title.json"))
+	register_data("titles", dbname, j, autoid=False)
+	print len(load_data("titless", dbname))
+
+
