@@ -11,24 +11,49 @@ function getCurrentPage()
     return (int) filter_input(INPUT_GET, 'page');
 }
 
+function getKeySearchQuery()
+{
+    $s_word = filter_input(INPUT_GET, 's_word');
+	$s_key = filter_input(INPUT_GET, 's_key');
+
+	if (empty($s_word)){
+		return null;
+	}else{
+	    return [$s_key => $s_word];
+	}
+    
+}
+
+function getOrderQuery()
+{	$sort = filter_input(INPUT_GET, 'sort');
+	$order = filter_input(INPUT_GET, 'order');
+
+	if (empty($sort)){
+		return null;
+	}else{
+	    return [$sort => $order];
+	}
+    
+}
+
 function asarray($str){
 	return explode(';', $str);
-	// try{return explode('[;]', $str);
-	// }catch(Exception $e){
-	// 	return $str;
-	// }
 }
 	
 
-function getobj($db_dir, $page = 0, $limit = null,  array $order = null){
-	#get database controller
-	$con=sqlite_open($db_dir);
-
+function getobj($con, $page = 0, $limit = null, array $order = null, $searchword=null){
 	#cuont all records
 	$record_num = $con->query("SELECT count(*) as count FROM titles")->fetchArray()["count"];
 
 	#set default sql request
 	$sql = "SELECT *  FROM titles";
+	
+	#検索ワードが指定されている時
+    if (!is_null($searchword)) {
+        foreach ((array)($searchword) as $s_key => $s_word) {
+            $sql .= sprintf(' WHERE %s LIKE "%%%s%%"',$s_key, $s_word);
+        }
+    }
 
 	#オーダーが指定されている時
     if (!is_null($order)) {
@@ -40,11 +65,11 @@ function getobj($db_dir, $page = 0, $limit = null,  array $order = null){
         $sql .= " ORDER BY {$orderStr}";
     }
 
-    #limit数が指定されている時
-    if (!is_null($limit)) {
-        $offset = $page * $limit;
-        $sql .= sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
-    }
+    // #limit数が指定されている時
+    // if (!is_null($limit)) {
+    //     $offset = $page * $limit;
+    //     $sql .= sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
+    // }
 
     $items = [];
 	$result = $con->query($sql);
@@ -52,15 +77,13 @@ function getobj($db_dir, $page = 0, $limit = null,  array $order = null){
 		$items[] = $row;
 	}
 
-	return [ "obj" => $items, "recnum" => $record_num];
+	return [ "obj" => $items, "recnum" => count($items), "recnum_all" => $record_num];
 
 }
 
 function pagination($recnum, $page, $limit){
-	$count = $recnum;
-
     //レコード総数がゼロのときは何も出力しない
-    if (0 === $count) {
+    if (0 === $recnum) {
         return '';
     }
 
@@ -68,7 +91,7 @@ function pagination($recnum, $page, $limit){
     $intCurrentPage = getCurrentPage();
 
     //ページの最大数
-    $intMaxpage = ceil($count / $limit);
+    $intMaxpage = ceil($recnum / $limit);
 
     //現在ページの前後３ページを出力
     $intStartpage = (2 < $intCurrentPage) ? $intCurrentPage - 3 : 0;
@@ -107,124 +130,163 @@ function pagination($recnum, $page, $limit){
     return sprintf('<div class="pagination">%s</div>', implode(PHP_EOL, $items));
 }
 
-ini_set('display_errors',3000);
-error_reporting(E_ALL);
+function get_sorttag($tag, $name = null){
+	if (!isset($name)){$name = $tag;}
+	$order=filter_input(INPUT_GET, 'order');
 
-$db_dir = "json2sqldata/database.db";
-$page = getCurrentPage();
-$limit = 30;
-$order = null;#['title' => 'asc', 'tag' => 'asc' ];
+	if (empty($order) or $order=="desc"){
+		$order = "asc";
+	}else{
+		$order = "desc";
+	}
 
-$ret = getobj($db_dir, $page, $limit, $order);
-$obj = $ret["obj"];
-$recnum = $ret["recnum"];
+	$searchword_=getKeySearchQuery();
+    if (!is_null($searchword_)) {
+        foreach ((array)($searchword_) as $s_key => $s_word) {
+	        $searchword_ = "s_key=".$s_key."&"."s_word=".$s_word."&";
+        }
+    }
+
+	echo sprintf('<a href="?%ssort=%s&order=%s">%s</a>',$searchword_,$tag,$order,$name);
+}
+
+
+function get_tag_query($s_key, $s_word){
+	$tag_arr = [$s_key => $s_word];
+    $query = "?s_key=".$s_key."&"."s_word=".$s_word."&";
+    return $query;
+}
+
+try{
+	ini_set('display_errors',3000);
+	error_reporting(E_ALL);
+
+	$db_dir = "json2sqldata/database.db";
+	$con =sqlite_open($db_dir);
+	$page = getCurrentPage();
+	$limit = 15;
+	$order = getOrderQuery();
+	$searchword = getKeySearchQuery();
+
+	$ret = getobj($con, $page, $limit, $order, $searchword);
+
+} catch (Exception $e) {
+    $err = $e->getMessage();
+}
 
  ?>
-
 <!DOCTYPE html>
 <html lang="ja">
 	<head>
+		<title>Bootstrap Example </title>
 		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Bootstrapの基本テンプレート</title>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<!--[if lt IE 9]>
-			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-		<![endif]-->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	</head>
 	<body>
-		<nav class="navbar navbar-inverse">
-		  <div class="container-fluid">
-		    <div class="navbar-header">
-		      <a class="navbar-brand" href="#">VideoListViwer</a>
-		    </div>
-		    <ul class="nav navbar-nav">
-		      <li class="active"><a href="#">Home</a></li>
-		      <!-- <li><a href="#">Downloaded <span class="badge ">26</span></a></li> -->
-		      <!-- <li valign="center"><a href="#"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a></li> -->
-
-		    </ul>
-		    <ul class="nav navbar-nav navbar-right">
-			  <li>
-			  	<form class="navbar-form navbar-left">
-				  <div class="input-group">
-				    <input type="text" class="form-control" placeholder="Search">
-				    <div class="input-group-btn">
-				      <button class="btn btn-default" type="submit">
-				        <i class="glyphicon glyphicon-search"></i>
-				      </button>
-				    </div>
-				  </div>
-				</form>
+		<nav class="navbar navbar-default banner">
+			<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation </span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="."><i class="glyphicon glyphicon-align-justify"></i> VideoListViwer</a>
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<form class="navbar-form navbar-right" method="get" action="." >
+				<div class="input-group">
+				<input type="hidden" name="s_key", value="title">
+				<input type="text" class="form-control" placeholder="Search" name="s_word" value=<? if(array_key_exists("title",(array)getKeySearchQuery())){echo getKeySearchQuery()["title"];}?>>
+				<div class="input-group-btn">
+				<button class="btn btn-default" type="submit">
+					<i class="glyphicon glyphicon-search"></i>
+				</button>
+<!-- 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+				<li><a href="#">title</a></li>
+				<li><a href="#">tag</a></li> -->
+				</ul>
+				</div>
+				</div>
+			</form>
+			<ul class="nav navbar-nav navbar-left navbar-nav-primary">
+				<li class="active">
+					<a href=".">Home </a>
 				</li>
-		    </ul>
-		  </div>
+				<li >
+					<a href="#">Setting</a>
+				</li>
+				<li>
+					<a href="#">Downloading 
+						<span class="badge ">2 </span>
+					</a>
+				</li>
+			</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+			</div>
+			<!-- /.container-fluid -->
 		</nav>
 		<div class="container">
-			<div class="alert alert-success">
-			<strong>Success!</strong> Indicates a successful or positive action.
+		<?php if (isset($err)) : ?>
+		<div class="alert alert-danger">
+		<strong>Database Error : </strong>Database file not found.
+		<?php else : ?>
+		<div class="alert alert-success">
+		<strong>
+			<i class="glyphicon glyphicon-ok"></i>Database connection :
+		</strong><? echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
 		</div>
-		<div>
-
 		<dir class="container">
-			<h2>Title list</h2>
-				  <!-- <p>The .table-hover class enables a hover state on table rows:</p>             -->
-				<table class="table table-hover ">
-					  <thead>
-					    <tr>
-					      <th>Title</th>
-					      <th>
-					      <a href="https://www.google.co.jp">tag</a>
-					      </th>
-					      <th>Air date</th>
-					      <th>downloaded</th>
-					    </tr>
-					  </thead>
-					  <tbody>
-						<?php 
-						// $jsonpath = "title.json";
-						// // echo file_exists($jsonpath);
-						// $json = file_get_contents($jsonpath);
-						// $json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
-						// $obj = json_decode($json,true);
-						// $obj = $obj;
+			<h2>Title list </h2>
+			<!-- <p>The .table-hover class enables a hover state on table rows:</p>             -->
+			<table class="table table-hover ">
+				<thead>
+					<tr>
+						<th><?= get_sorttag("title"); ?> </th>
+						<th><?= get_sorttag("tag"); ?> </th>
+						<th><?= get_sorttag("air_date"); ?> </th>
+						<th><?= get_sorttag("downloaded"); ?> </th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php 
 						$taglist = [
 								    "drama" => "label-primary",
 								    "anime" => "label-success",
 								    "variery" => "label-warning",];
 
-						foreach ($obj as $key => $val){
+						foreach ($ret["obj"] as $key => $val){
 							echo "<tr>";
 
-							echo '<td width="70%">'.$val["title"]."</td>";
+							echo '<td width="60%">'.$val["title"]."</td>";
 					
-							echo "<td>";
+							echo '<td>';
 							foreach (asarray($val["tag"]) as $res){
-								echo '<span class="label '. $taglist[$res] .'">'.$res.'</span>&nbsp;';}
+								echo sprintf('<a class="label %s" href=%s>%s</a>&nbsp;',$taglist[$res],get_tag_query("tag",$res),$res);}
 							echo "</td>";
 
-							echo "<td>".$val["day"]."</td>";
-							echo '<td align="center"><span class="badge ">'.$val["story_num"]."</span></td>";
+							echo "<td>".$val["air_date"]."</td>";
+							echo '<td align="center"><span class="badge ">'.$val["downloaded"]."</span></td>";
 							echo "</tr>";
 						}
 					   ?>
-
-
-
-	  				  </tbody>
-				</table>
-				<nav align="center">
-					<ul class="pagination">
-					<?= pagination($recnum, $page, $limit); ?>
-					</ul>
-				</nav>
-
+				</tbody>
+			</table>
+			<nav align="center">
+				<ul class="pagination">
+					<?php endif; ?><?= pagination($ret["recnum"], $page, $limit); ?> 
+				</ul>
+			</nav>
 		</dir>
-
-
-	</div>
-<!-- <p>今日は：<?php date_default_timezone_set('Asia/Tokyo'); echo date(‘Y年m月d日’); ?>です。</p>
- -->	</body>
+	</body>
 </html>

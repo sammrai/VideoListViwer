@@ -54,6 +54,6 @@ if __name__ == "__main__":
 	os.remove(dbname)
 	j=json.load(open("../title.json"))
 	register_data("titles", dbname, j, autoid=False)
-	print len(load_data("titles", dbname))
+	# print len(load_data("titles", dbname))
 
 
