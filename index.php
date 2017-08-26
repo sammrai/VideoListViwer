@@ -208,44 +208,33 @@ try{
 				<button class="btn btn-default" type="submit">
 					<i class="glyphicon glyphicon-search"></i>
 				</button>
-<!-- 				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-					<span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu" role="menu">
-				<li><a href="#">title</a></li>
-				<li><a href="#">tag</a></li> -->
+
 				</ul>
 				</div>
 				</div>
 			</form>
 			<ul class="nav navbar-nav navbar-left navbar-nav-primary">
-				<li class="active">
-					<a href=".">Home </a>
-				</li>
-				<li >
-					<a href="#">Setting</a>
-				</li>
-				<li>
-					<a href="#">Downloading 
-						<span class="badge ">2 </span>
-					</a>
-				</li>
+				<li class="active"><a href=".">Home </a></li>
+				<li ><a href="#">Setting</a></li>
+				<li><a href="#">Downloading <span class="badge ">2 </span></a></li>
 			</ul>
 			</div>
 			<!-- /.navbar-collapse -->
 			</div>
 			<!-- /.container-fluid -->
 		</nav>
+
 		<div class="container">
-		<?php if (isset($err)) : ?>
-		<div class="alert alert-danger">
-		<strong>Database Error : </strong>Database file not found.
-		<?php else : ?>
-		<div class="alert alert-success">
-		<strong>
-			<i class="glyphicon glyphicon-ok"></i>Database connection :
-		</strong><? echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
+			<?php if (isset($err)) : ?>
+			<div class="alert alert-danger">
+			<strong>Database Error : </strong>Database file not found.
+			<?php else : ?>
+			<div class="alert alert-success">
+			<strong>
+				<i class="glyphicon glyphicon-ok"></i>Database connection :
+			</strong><? echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
 		</div>
+
 		<dir class="container">
 			<h2>Title list </h2>
 			<!-- <p>The .table-hover class enables a hover state on table rows:</p>             -->
@@ -287,6 +276,12 @@ try{
 					<?php endif; ?><?= pagination($ret["recnum"], $page, $limit); ?> 
 				</ul>
 			</nav>
+		</dir>
+
+		<dir class="container">
+			<footer align="center">
+			<p class="text-muted"><a href="https://github.com/shun-sa/VideoListViwer">Github</a></p>
+			</footer>
 		</dir>
 	</body>
 </html>
