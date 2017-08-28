@@ -1,8 +1,12 @@
 <?php 
 
-function sqlite_open($location) 
-{ 
+function sqlite_open($location){ 
     $handle = new SQLite3($location); 
+    try {
+	    $handle->enableExceptions(true);
+	} catch (Exception $e) {
+	    echo 'Caught exception: ' . $e->getMessage();
+	}
     return $handle; 
 } 
 
@@ -24,8 +28,8 @@ function getKeySearchQuery()
     
 }
 
-function getOrderQuery()
-{	$sort = filter_input(INPUT_GET, 'sort');
+function getOrderQuery(){	
+	$sort = filter_input(INPUT_GET, 'sort');
 	$order = filter_input(INPUT_GET, 'order');
 
 	if (empty($sort)){
