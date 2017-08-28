@@ -1,11 +1,16 @@
 <?php 
 
 function sqlite_open($location){ 
+	#ファイル存在確認
+	if (!file_exists($location)){
+		throw new Exception('Database file doesn\'t exist. "'.$location.'"');}
+
+	#データベース接続
     $handle = new SQLite3($location); 
     try {
 	    $handle->enableExceptions(true);
 	} catch (Exception $e) {
-	    echo 'Caught exception: ' . $e->getMessage();
+	    $err = $e->getMessage();
 	}
     return $handle; 
 } 
@@ -230,13 +235,14 @@ try{
 
 		<div class="container">
 			<?php if (isset($err)) : ?>
-			<div class="alert alert-danger">
-			<strong>Database Error : </strong>Database file not found.
+				<div class="alert alert-danger">
+				<strong>Error : </strong>
+				<?php echo $err; ?></div>
 			<?php else : ?>
 			<div class="alert alert-success">
 			<strong>
-				<i class="glyphicon glyphicon-ok"></i>Database connection :
-			</strong><? echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
+				<i class="glyphicon glyphicon-ok"></i> Success! :
+			</strong><?php echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
 		</div>
 
 		<dir class="container">
