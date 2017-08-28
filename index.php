@@ -87,7 +87,7 @@ function getobj($con, $page = 0, $limit = null, array $order = null, $searchword
 		$items[] = $row;
 	}
 
-	return [ "obj" => $items, "recnum" => count($items), "recnum_all" => $record_num];
+	return [ "obj" => array_slice($items, $page * $limit, $limit), "recnum" => count($items), "recnum_all" => $record_num];
 
 }
 
@@ -217,9 +217,7 @@ try{
 									    "drama" => "label-primary",
 									    "anime" => "label-success",
 									    "variery" => "label-warning",];
-							$i=0;
 							foreach ($ret["obj"] as $key => $val){
-								if($i==$limit){break;}
 								echo "<tr>";
 
 								echo '<td width="60%">'.$val["title"]."</td>";
@@ -232,7 +230,6 @@ try{
 								echo "<td>".$val["air_date"]."</td>";
 								echo '<td align="center"><span class="badge ">'.$val["downloaded"]."</span></td>";
 								echo "</tr>";
-								$i++;
 							}
 						   ?>
 					</tbody>
