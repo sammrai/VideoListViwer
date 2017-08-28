@@ -9,6 +9,11 @@ require "includes/common.php";
 	<body>
 	<?php include("includes/navbar.php");?>
 
+	<div class="container">
+		<div class="alert alert-danger">
+		<strong>Error : </strong> This page is under construction.
+		</div>
+	</div>
 
 	<?php include("includes/footer.php");?>
 	</body>

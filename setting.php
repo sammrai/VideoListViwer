@@ -34,8 +34,8 @@ if (!is_empty($_POST)){
 
 		<?php foreach($ini as $key => $value): ?>
 			<div class="input-group" style="padding: 0.5%;">
-				<span class="input-group-addon"> <? echo $key ?> </span>
-				<input type="text" class="form-control" value="<? echo $value ?>" name= <? echo $key ?> >
+				<span class="input-group-addon"> <?php echo $key ?> </span>
+				<input type="text" class="form-control" value="<?php echo $value ?>" name= <?php echo $key ?> >
 			</div> 
 		<?php endforeach; ?>
 		<nav align="center" style="margin: 1%;">
