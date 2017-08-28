@@ -1,4 +1,5 @@
 <?php 
+require "includes/common.php"; 
 
 function sqlite_open($location){ 
 	#ファイル存在確認
@@ -166,72 +167,25 @@ function get_tag_query($s_key, $s_word){
     return $query;
 }
 
+
 try{
-
-	ini_set('display_errors',3000);
-	error_reporting(E_ALL);
-
 	$db_dir = "json2sqldata/database.db";
 	$con =sqlite_open($db_dir);
 	$page = getCurrentPage();
-	$limit = 15;
+	$limit = $ini_array["limit"];
 	$order = getOrderQuery();
 	$searchword = getKeySearchQuery();
-
 	$ret = getobj($con, $page, $limit, $order, $searchword);
-
 } catch (Exception $e) {
     $err = $e->getMessage();
 }
+?>
 
- ?>
 <!DOCTYPE html>
 <html lang="ja">
-	<head>
-		<title>Bootstrap Example </title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	</head>
+<?php include("includes/head.php");?>
 	<body>
-		<nav class="navbar navbar-default banner">
-			<div class="container-fluid">
-			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-				<span class="sr-only">Toggle navigation </span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="."><i class="glyphicon glyphicon-align-justify"></i> VideoListViwer</a>
-			</div>
-			<!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<form class="navbar-form navbar-right" method="get" action="." >
-				<div class="input-group">
-				<input type="hidden" name="s_key", value="title">
-				<input type="text" class="form-control" placeholder="Search" name="s_word" value=<?php echo (array_key_exists("title",(array)getKeySearchQuery()))?getKeySearchQuery()["title"] :"" ; ?> >
-				<div class="input-group-btn">
-				<button class="btn btn-default" type="submit">
-					<i class="glyphicon glyphicon-search"></i>
-				</button>
-				</ul>
-				</div>
-				</div>
-			</form>
-			<ul class="nav navbar-nav navbar-left navbar-nav-primary">
-				<li class="active"><a href=".">Home </a></li>
-				<li ><a href="#">Setting</a></li>
-				<li><a href="#">Downloading <span class="badge ">2 </span></a></li>
-			</ul>
-			</div>
-			<!-- /.navbar-collapse -->
-			</div>
-			<!-- /.container-fluid -->
-		</nav>
+		<?php include("includes/navbar.php");?>
 
 		<div class="container">
 			<?php if (isset($err)) : ?>
@@ -239,61 +193,58 @@ try{
 				<strong>Error : </strong>
 				<?php echo $err; ?></div>
 			<?php else : ?>
-			<div class="alert alert-success">
-			<strong>
+				<div class="alert alert-success">
+				<strong>
 				<i class="glyphicon glyphicon-ok"></i> Success! :
-			</strong><?php echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
+				</strong><?php echo sprintf("%s",$ret["recnum_all"]) ?> valid titles were found. 
+				</div>
+
+			<div class="container">
+				<h2>Title list </h2>
+				<!-- <p>The .table-hover class enables a hover state on table rows:</p>             -->
+				<table class="table table-hover ">
+					<thead>
+						<tr>
+							<th><?= get_sorttag("title"); ?> </th>
+							<th><?= get_sorttag("tag"); ?> </th>
+							<th><?= get_sorttag("air_date"); ?> </th>
+							<th><?= get_sorttag("downloaded"); ?> </th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php 
+							$taglist = [
+									    "drama" => "label-primary",
+									    "anime" => "label-success",
+									    "variery" => "label-warning",];
+							$i=0;
+							foreach ($ret["obj"] as $key => $val){
+								if($i==$limit){break;}
+								echo "<tr>";
+
+								echo '<td width="60%">'.$val["title"]."</td>";
+						
+								echo '<td>';
+								foreach (asarray($val["tag"]) as $res){
+									echo sprintf('<a class="label %s" href=%s>%s</a>&nbsp;',$taglist[$res],get_tag_query("tag",$res),$res);}
+								echo "</td>";
+
+								echo "<td>".$val["air_date"]."</td>";
+								echo '<td align="center"><span class="badge ">'.$val["downloaded"]."</span></td>";
+								echo "</tr>";
+								$i++;
+							}
+						   ?>
+					</tbody>
+				</table>
+				<nav align="center">
+					<ul class="pagination">
+						<?php endif; ?><?= pagination($ret["recnum"], $page, $limit); ?> 
+					</ul>
+				</nav>
+			</div>
 		</div>
 
-		<dir class="container">
-			<h2>Title list </h2>
-			<!-- <p>The .table-hover class enables a hover state on table rows:</p>             -->
-			<table class="table table-hover ">
-				<thead>
-					<tr>
-						<th><?= get_sorttag("title"); ?> </th>
-						<th><?= get_sorttag("tag"); ?> </th>
-						<th><?= get_sorttag("air_date"); ?> </th>
-						<th><?= get_sorttag("downloaded"); ?> </th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php 
-						$taglist = [
-								    "drama" => "label-primary",
-								    "anime" => "label-success",
-								    "variery" => "label-warning",];
-						$i=0;
-						foreach ($ret["obj"] as $key => $val){
-							if($i==$limit){break;}
-							echo "<tr>";
-
-							echo '<td width="60%">'.$val["title"]."</td>";
-					
-							echo '<td>';
-							foreach (asarray($val["tag"]) as $res){
-								echo sprintf('<a class="label %s" href=%s>%s</a>&nbsp;',$taglist[$res],get_tag_query("tag",$res),$res);}
-							echo "</td>";
-
-							echo "<td>".$val["air_date"]."</td>";
-							echo '<td align="center"><span class="badge ">'.$val["downloaded"]."</span></td>";
-							echo "</tr>";
-							$i++;
-						}
-					   ?>
-				</tbody>
-			</table>
-			<nav align="center">
-				<ul class="pagination">
-					<?php endif; ?><?= pagination($ret["recnum"], $page, $limit); ?> 
-				</ul>
-			</nav>
-		</dir>
-
-		<dir class="container">
-			<footer align="center">
-			<p class="text-muted"><a href="https://github.com/shun-sa/VideoListViwer">Github</a></p>
-			</footer>
-		</dir>
+ 	<?php include("includes/footer.php");?>
 	</body>
 </html>
