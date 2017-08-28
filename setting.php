@@ -1,7 +1,4 @@
-<?php 
-require "includes/common.php"; 
-
-?>
+<?php require "includes/common.php"; ?>
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -12,22 +9,43 @@ require "includes/common.php";
 	<div class="container">
 
 <?php
- $conf_file = $config_file; // 書き込み可になっていること。予め空ファイルを作成するのが吉
- $ini = parse_ini_file($conf_file);
- if ($_POST['limit']) $ini['limit'] = $_POST['limit'];
- $fp = fopen($conf_file, 'w');
- foreach ($ini as $k => $i) fputs($fp, "$k=$i\n");
- fclose($fp);
+$save=false;
+$ini = parse_ini_file($config_file);
+if (!is_empty($_POST)){
+	$ini= array_merge($ini,$_POST);
+	$fp = fopen($config_file, 'w');
+	foreach ($ini as $k => $i) fputs($fp, "$k=$i\n");
+	fclose($fp);
+	$save=true;
+
+}
+
 ?>
+<div class="container">
+	<?php if ($save) : ?>
+		<div class="alert alert-success">
+		<strong>
+		<i class="glyphicon glyphicon-ok"></i> Success! :
+		</strong> Settings saved.
+		</div>
+	<?php endif; ?>
 
-<form method="post" action="">
-  YourAge <input type="number" name="limit" value="<?php print $ini['limit'] ?>"><br>
-  <input type="submit" value="保存">
-</form>
+	<form method="post" action="">
+
+		<?php foreach($ini as $key => $value): ?>
+			<div class="input-group" style="padding: 0.5%;">
+				<span class="input-group-addon"> <? echo $key ?> </span>
+				<input type="text" class="form-control" value="<? echo $value ?>" name= <? echo $key ?> >
+			</div> 
+		<?php endforeach; ?>
+		<nav align="center" style="margin: 1%;">
+			<input type="submit" class="btn btn-primary" value="Save">
+		</nav>
 
 
-	</div>
+	</form>
 
+</div>
 
 
 	<?php include("includes/footer.php");?>
