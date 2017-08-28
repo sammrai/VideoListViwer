@@ -52,7 +52,7 @@ def load_data(tabele_name, database_name):
 if __name__ == "__main__":
 	dbname = 'database.db'
 	os.remove(dbname)
-	j=json.load(open("../title.json"))
+	j=json.load(open("title.json"))
 	register_data("titles", dbname, j, autoid=False)
 	# print len(load_data("titles", dbname))
 

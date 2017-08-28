@@ -158,6 +158,7 @@ function get_tag_query($s_key, $s_word){
 }
 
 try{
+
 	ini_set('display_errors',3000);
 	error_reporting(E_ALL);
 
@@ -203,12 +204,11 @@ try{
 			<form class="navbar-form navbar-right" method="get" action="." >
 				<div class="input-group">
 				<input type="hidden" name="s_key", value="title">
-				<input type="text" class="form-control" placeholder="Search" name="s_word" value=<? if(array_key_exists("title",(array)getKeySearchQuery())){echo getKeySearchQuery()["title"];}?>>
+				<input type="text" class="form-control" placeholder="Search" name="s_word" value=<?php echo (array_key_exists("title",(array)getKeySearchQuery()))?getKeySearchQuery()["title"] :"" ; ?> >
 				<div class="input-group-btn">
 				<button class="btn btn-default" type="submit">
 					<i class="glyphicon glyphicon-search"></i>
 				</button>
-
 				</ul>
 				</div>
 				</div>
