@@ -1,53 +1,95 @@
-<?php require "includes/common.php"; ?>
+<?php 
+require "includes/common.php"; 
 
-<!DOCTYPE html>
-<html lang="ja">
-<?php include("includes/head.php");?>
-	<body>
-	<?php include("includes/navbar.php");?>
+function write_php_ini($array, $file){
+    $res = array();
+    // print_r( $array);
+    foreach($array as $key => $val)
+    {
+        if(is_array($val))
+        {
+            $res[] = "[$key]";
+            foreach($val as $skey => $sval) $res[] = "$skey = ".(is_numeric($sval) ? $sval : '"'.$sval.'"');
+            $res[] = "";
+        }
+        else $res[] = "$key = ".(is_numeric($val) ? $val : '"'.$val.'"');
+    }
+    
+    safefilerewrite($file, implode("\r\n", $res));
+}
 
-	<div class="container">
+function safefilerewrite($fileName, $dataToSave){    
+	if ($fp = fopen($fileName, 'w'))
+    {
+        $startTime = microtime(TRUE);
+        do
+        {            $canWrite = flock($fp, LOCK_EX);
+           // If lock not obtained sleep for 0 - 100 milliseconds, to avoid collision and CPU load
+           if(!$canWrite) usleep(round(rand(0, 100)*1000));
+        } while ((!$canWrite)and((microtime(TRUE)-$startTime) < 5));
 
-<?php
-$save=false;
-$ini = parse_ini_file($config_file);
-if (!is_empty($_POST)){
-	$ini= array_merge($ini,$_POST);
-	$fp = fopen($config_file, 'w');
-	foreach ($ini as $k => $i) fputs($fp, "$k=$i\n");
-	fclose($fp);
-	$save=true;
+        //file was locked so now we can store information
+        if ($canWrite)
+        {            fwrite($fp, $dataToSave);
+            flock($fp, LOCK_UN);
+        }
+        fclose($fp);
+    }
 
 }
 
+$save=false;
+$ini = parse_ini_file($config_file, true);
+
+
+if (!is_empty($_POST)){
+	$ini= array_merge($ini,$_POST);
+	// $ini = var_dump($ini);
+	// print_r($ini);
+	write_php_ini($ini, $config_file);
+
+	// $fp = fopen($config_file, 'w');
+	// foreach ($ini as $k => $i) fputs($fp, "$k=$i\n");
+	// fclose($fp);
+	$save=true;
+}
+
 ?>
-<div class="container">
-	<?php if ($save) : ?>
-		<div class="alert alert-success">
-		<strong>
-		<i class="glyphicon glyphicon-ok"></i> Success! :
-		</strong> Settings saved.
+<!DOCTYPE html>
+<html lang="ja">
+<?php include("includes/head.php");?>
+<body>
+	<?php include("includes/navbar.php");?>
+	
+	<div class="container">
+		<?php if ($save) : ?>
+			<div class="alert alert-success">
+			<strong>
+			<i class="glyphicon glyphicon-ok"></i> Success! :
+			</strong> Settings saved.
+			</div>
+		<?php endif; ?>
+
+		<div class="setting_page">
+			<form method="post" action="">
+
+				<?php foreach($ini as $section => $item): ?>
+					<h3> <?php echo $section ?> </h3>
+					<?php foreach($item as $key => $value): ?>
+						<div class="input-group" style="padding: 0.2em;">
+							<span class="input-group-addon"> <?php echo $key ?> </span>
+							<input type="<?php echo is_numeric($value) ? "number":"text" ?>" class="form-control" value="<?php echo $value ?>"
+							 name= <?php echo sprintf("%s[%s]",$section,$key) ?> >
+						</div> 
+					<?php endforeach; ?>
+				<?php endforeach; ?>
+					<nav align="center" class="botton_button">
+						<input type="submit" class="btn btn-primary" value="Save">
+					</nav>
+			</form>
 		</div>
-	<?php endif; ?>
-
-	<form method="post" action="">
-
-		<?php foreach($ini as $key => $value): ?>
-			<div class="input-group" style="padding: 0.5%;">
-				<span class="input-group-addon"> <?php echo $key ?> </span>
-				<input type="text" class="form-control" value="<?php echo $value ?>" name= <?php echo $key ?> >
-			</div> 
-		<?php endforeach; ?>
-		<nav align="center" style="margin: 1%;">
-			<input type="submit" class="btn btn-primary" value="Save">
-		</nav>
-
-
-	</form>
-
-</div>
-
+	</div>
 
 	<?php include("includes/footer.php");?>
-	</body>
+</body>
 </html>
