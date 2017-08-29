@@ -3,10 +3,17 @@
     text-align:left;
 }
 
-/*.setting_page {
-	padding: 0px 50px 0px; //top (right,left) bottom
-}*/
 
 .botton_button {
 	padding: 1em 0em; //(top and bottom) (right and left )
 }
+
+.hiddenRow {
+    padding: 0 ;
+}
+
+.align {
+display: inline-block;
+width: 10em;
+}
+

@@ -63,10 +63,13 @@ if (!is_empty($_POST)){
 	
 	<div class="container">
 		<?php if ($save) : ?>
-			<div class="alert alert-success">
-			<strong>
-			<i class="glyphicon glyphicon-ok"></i> Success! :
-			</strong> Settings saved.
+			<div class="alert alert-success alert-dismissible fade in">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>
+				<i class="glyphicon glyphicon-ok"></i> Success! :
+				</strong> Settings saved.
 			</div>
 		<?php endif; ?>
 
