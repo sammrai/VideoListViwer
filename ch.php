@@ -8,14 +8,7 @@ function get_json($jsonpath){
 	return json_decode($json,true);
 }
 
-function sort_with_key($array, $sortkey){
-	foreach ((array) $array as $key => $value) {
-	    $sort[$key] = $value[$sortkey];
-	}
 
-	array_multisort($sort, SORT_ASC, $array);
-	return ($array);
-}
 
 try{
 	$jsonpath = $DL_DIR."/blog-entry-117403/urls.json";
