@@ -1,8 +1,13 @@
 import sys,os
 import signal
-print "kill",sys.argv[1]
+f=open("jobpid","r")
+pid= int(f.read())
+
 try:
-	os.kill(sys.argv[1], signal.SIGKILL)
+	os.kill(pid, signal.SIGKILL)
+	os.remove("jobpid")
 	print "0"
 except:
 	print "1"
+
+

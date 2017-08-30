@@ -8,6 +8,15 @@ function get_json($jsonpath){
 	return json_decode($json,true);
 }
 
+function sort_with_key($array, $sortkey){
+	foreach ((array) $array as $key => $value) {
+	    $sort[$key] = $value[$sortkey];
+	}
+
+	array_multisort($sort, SORT_ASC, $array);
+	return ($array);
+}
+
 try{
 	$jsonpath = $DL_DIR."/blog-entry-117403/urls.json";
 	$obj = get_json($jsonpath);
@@ -63,7 +72,7 @@ try{
 			<div class="panel-heading"><h1 class="panel-title">Title list</h1></div>
 			<table class="table table-hover ">
 				<tbody>
-						<?php foreach ($obj["episodes"] as $key => $val): ?>
+						<?php foreach (sort_with_key($obj["episodes"],"episode_ind") as $key => $val): ?>
 							<tr data-toggle="collapse" data-target='#<?php echo "accordion".$val["episode_ind"] ?>' class="clickable">
 							<td># <?php echo $val["episode_ind"] ?></td>
 							<td ><?php echo $val["name"] ?></td>

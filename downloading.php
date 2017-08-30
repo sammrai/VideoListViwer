@@ -4,29 +4,34 @@ require "includes/common.php";
 
 
 
-function excutecmd($pypath, $scriptpath){
+function excutecmd($pypath, $scriptpath, $echo=false){
 	$fullPath =$pypath.' '.$scriptpath;
-    exec($fullPath, $outpara);
-    echo '<PRE>';
-    echo ($fullPath);
-    echo "<br>";
-    print_r($outpara);
-    echo '<PRE>';
-    return $outpara;
-}
-$pid="aa";
+	if (PHP_OS=="Darwin") $fullPath .=" 2>&1 &";
 
-if (isset($_POST["sub1"])) {
-    $kbn = htmlspecialchars($_POST["sub1"], ENT_QUOTES, "UTF-8");
-    switch ($kbn) {
-        case "run": excutecmd($PY_PATH,'test.py'); break;
-        case "stop": excutecmd($PY_PATH,'kill.py '."$pid"); break;
-        default:  echo "エラー"; exit;
-    }
-}
-?>
-		
+	error_reporting(E_ALL);
+	$handle = popen($fullPath, 'r');
 
+	if ($echo){
+		// echo "<pre>";
+		$read = stream_get_contents($handle);
+		// echo $read;
+		// pclose($handle);
+		// echo "</pre>";
+	    return $read;
+	}
+}
+// $pid="aa";
+
+// $dataArray=array(15,35,64);
+// file_put_contents("hoge.dat", serialize($dataArray));
+// $dataArray = unserialize(file_get_contents("hoge.dat"));
+// print_r($dataArray)
+// $hoge = ['a','b','c'];
+// $json_encode_hoge = json_encode($hoge);
+// // print_r($json_encode_hoge);
+// file_put_contents("hoge.dat", $json_encode_hoge);
+// $dataArray = json_decode(file_get_contents("hoge.dat"));
+// print_r($dataArray)
 
 ?>
 
@@ -50,8 +55,16 @@ if (isset($_POST["sub1"])) {
 				</nav>
 			</form>
 
-
-
+<?php
+if (isset($_POST["sub1"])) {
+    $kbn = htmlspecialchars($_POST["sub1"], ENT_QUOTES, "UTF-8");
+    switch ($kbn) {
+        case "run": excutecmd($PY_PATH,'test.py'); break;
+        case "stop":echo excutecmd($PY_PATH,'kill.py',$echo=true); break;
+        default:  echo "エラー"; exit;
+    }
+}
+?>
 
 	</div>
 
@@ -63,17 +76,7 @@ if (isset($_POST["sub1"])) {
 
 	</body>
 </html>
-<?php
-$cmd = 'Start-Job C:\Users\4046672\AppData\Local\conda\conda\envs\py27\python.exe test.py';
 
-while (@ ob_end_flush()); // end all output buffers if any
 
-$proc = popen($cmd, 'r');
-echo '<pre>';
-while (!feof($proc))
-{
-    echo fread($proc, 4096);
-    @ flush();
-}
-echo '</pre>';
-?>
+
+
