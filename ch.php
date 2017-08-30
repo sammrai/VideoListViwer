@@ -70,8 +70,8 @@ try{
 							<td align="right">
 
 								<div class="btn-group" >
-								<a href="#" class="btn btn-default btn-sm">DL</a>
-								<a href="#" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+								<a href="#" class="btn btn-default btn-xs">DL</a>
+								<a href="#" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 								<span class="caret"></span>
 								</a>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
@@ -86,8 +86,8 @@ try{
 
 							</tr>
 
-							<!-- <tr>
-								<td colspan="2" class="hiddenRow" style="padding: 0;">
+							<tr>
+								<td colspan="3" class="hiddenRow" style="padding: 0;">
 								<div id='<?php echo "accordion".$val["episode_ind"] ?>' class="collapse">
 								
 								<div class="panel-body">
@@ -98,7 +98,7 @@ try{
 								</div>
 								</div>
 								</td>
-							</tr> -->
+							</tr>
 						
 					   <?php endforeach; ?>
 				</tbody>
