@@ -1,11 +1,8 @@
 <?php 
 require "includes/common.php"; 
-// file name: test.php
 
-
-
-function excutecmd($pypath, $scriptpath, $echo=false){
-	$fullPath =$pypath.' '.$scriptpath;
+function excutecmd($cmdpath, $scriptpath, $echo=false){
+	$fullPath =$cmdpath.' '.$scriptpath;
 	if (PHP_OS=="Darwin") $fullPath .=" 2>&1 &";
 
 	error_reporting(E_ALL);
@@ -20,16 +17,6 @@ function excutecmd($pypath, $scriptpath, $echo=false){
 	    return $read;
 	}
 }
-// $pid="aa";
-
-// $dataArray=array(15,35,64);
-// file_put_contents("hoge.dat", serialize($dataArray));
-// $dataArray = unserialize(file_get_contents("hoge.dat"));
-// print_r($dataArray)
-// $hoge = ['a','b','c'];
-// $json_encode_hoge = json_encode($hoge);
-// // print_r($json_encode_hoge);
-// file_put_contents("jobpid", $json_encode_hoge);
 
 
 ?>
@@ -51,6 +38,7 @@ function excutecmd($pypath, $scriptpath, $echo=false){
 				<nav align="center" class="botton_button">
 					<input type="submit" class="btn btn-primary" value="run" name="sub1">
 					<input type="submit" class="btn btn-default" value="reflesh" name="sub1">
+					<input type="submit" class="btn btn-default" value="killall" name="sub1">
 				</nav>
 			</form>
 
@@ -64,11 +52,15 @@ if (isset($_POST["sub1"])) {
         case "stop":
 	    	$arg1 = "jobpid";
 	    	$arg2 = filter_input(INPUT_POST, 'arg2');
-	    	excutecmd($PY_PATH,'kill.py'." ".$arg1." ".$arg2);
+	    	excutecmd($PY_PATH,'kill.py'." ".$arg1." -p ".$arg2);
 	    	break;
         case "reflesh":
 	        $arg1 = "jobpid";
-	        excutecmd($PY_PATH,'kill.py'." ".$arg1);
+	        excutecmd($PY_PATH,'kill.py'." ".$arg1." -r");
+	        break;
+        case "killall":
+	        $arg1 = "jobpid";
+	        excutecmd($PY_PATH,'kill.py'." ".$arg1." -a");
 	        break;
         default:  echo "エラー"; exit;
 
@@ -84,16 +76,14 @@ $dataArray = json_decode(file_get_contents("jobpid"),true);
 				<table class="table table-hover ">
 					<tbody>
 							<?php foreach ($dataArray as $key => $val): ?>
-								<tr data-toggle="collapse" data-target='#<?php echo "accordion".$val["episode_ind"] ?>' class="clickable">
+								<tr >
 								<td><?php echo $key ?></td>
 								<td ><?php echo $val["time"] ?></td>
 								<td ><?php echo $val["flag"] ?></td>
 								<td align="right">
 									<form method="POST" action="">
-									<div class="btn-group" >
 									<input type="hidden" value="<?php echo $key ?>" name="arg2">
 									<input type="submit" class="btn btn-danger" value="stop" name="sub1">
-									</div>
 									</form>
 								</td>
 								</tr>

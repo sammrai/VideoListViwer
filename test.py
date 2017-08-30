@@ -1,7 +1,7 @@
 import time,os
 import json
 import signal
-print "#"
+
 def check_pid(pid):        
     try:
         os.kill(pid, 0)
@@ -35,14 +35,18 @@ def write_json(file_name,dic):
 	with open(file_name, 'w') as f:
 	    json.dump(dic, f)
 
-def refresh(file_name):
+def reflesh(file_name):
 	j = load_json(file_name)
 	for i in j:
 		remove_pid(file_name,i)
 
+def killall(file_name):
+	j = load_json(file_name)
+	for i in j:
+		kill_process(file_name,i)
 
 def add_pid(file_name,pid_dic):
-	refresh(file_name)
+	reflesh(file_name)
 	
 	j=load_json(file_name)
 	j.update(pid_dic)
@@ -73,6 +77,6 @@ if __name__ == '__main__':
 		# f=open("test_%03d"%i,"w")
 		# f.close()
 		# print os.system("touch %03d"%i)
-		time.sleep(10)
+		time.sleep(30)
 
 	remove_pid(file_name,pid,force=True)
