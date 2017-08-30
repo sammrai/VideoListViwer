@@ -189,6 +189,6 @@ error_reporting(E_ALL);
 $config_file ="config.ini";
 $ini_array = parse_ini_file($config_file);
 $DL_DIR=$ini_array["download_dir"];
-
+$PY_PATH=$ini_array["python_path"]
 ?>
 

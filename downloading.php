@@ -15,6 +15,36 @@ require "includes/common.php";
 		</div>
 	</div>
 
+
+		<div class="container">
+		<!-- <div class="alert alert-danger"> -->
+		
+
+		<?php
+// file name: test.php
+function excute($fullPath){
+      // 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc';
+    exec($fullPath, $outpara);
+    echo '<PRE>';
+    echo ($fullPath);
+    echo "<br>";
+    print_r($outpara);
+    echo '<PRE>';
+}
+
+excute($fullPath =$PY_PATH.' test.py')
+
+?>
+
+
+		<!-- </div> -->
+	</div>
+
+
 	<?php include("includes/footer.php");?>
+
+
+
+
 	</body>
 </html>
