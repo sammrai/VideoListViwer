@@ -2,7 +2,20 @@ import time,os
 import json
 import signal
 
-def check_pid(pid):        
+
+def pid_running_win(pid):
+    import ctypes
+    kernel32 = ctypes.windll.kernel32
+    SYNCHRONIZE = 0x100000
+
+    process = kernel32.OpenProcess(SYNCHRONIZE, 0, pid)
+    if process != 0:
+        kernel32.CloseHandle(process)
+        return True
+    else:
+        return False
+
+def pid_running_unix(pid):
     try:
         os.kill(pid, 0)
     except OSError:
@@ -10,18 +23,35 @@ def check_pid(pid):
     else:
         return True
 
+def check_pid(pid):        
+    if os.name=="nt":return pid_running_win(pid)
+    if os.name=="posix":return pid_running_unix(pid)
+
 def ascii_encode_dict(data):
     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
     return dict(map(ascii_encode, pair) for pair in data.items())
 
-def kill_process(file_name,pid):
-	pid=int(pid)
-	remove_pid(file_name,pid)
+
+def kill_process_win(pid):
+	if check_pid(pid):
+		os.kill(pid, signal.SIGTERM)
+		return 0
+	else:
+		return 1
+
+def kill_process_unix(pid):
 	if check_pid(pid):
 		os.kill(pid, signal.SIGKILL)
 		return 0
 	else:
 		return 1
+
+def kill_process(file_name,pid):
+	pid=int(pid)
+	remove_pid(file_name,pid,force=True)
+	if os.name=="nt":return kill_process_win(pid)
+	if os.name=="posix":return kill_process_unix(pid)
+
 
 def load_json(file_name):
 	try:
@@ -71,6 +101,7 @@ if __name__ == '__main__':
 	pid_dic = {pid:{"flag" : True,"time":date}}
 	file_name="jobpid"
 
+	reflesh(file_name)
 	add_pid(file_name,pid_dic)
 	for i in range(6):
 		print i
