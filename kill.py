@@ -12,13 +12,14 @@ def getparse():
 	return parser.parse_args()
 
 args = getparse()
+jm=test.jobmng()
 
 if args.pid:
 	print "remove"
-	test.kill_process(args.file_in,args.pid)
+	jm.kill_process(args.file_in,args.pid)
 if args.reflesh:
 	print "reflesh"
-	test.reflesh(args.file_in)
+	jm.reflesh(args.file_in)
 if args.all:
 	print "all"
-	test.killall(args.file_in)
+	jm.killall(args.file_in)
