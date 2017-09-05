@@ -1,5 +1,24 @@
 <?php 
 
+function excutecmd($cmdpath, $scriptpath, $echo=false){
+    $fullPath =$cmdpath.' '.$scriptpath;
+    if (PHP_OS=="Darwin") $fullPath .=" 2>&1 &";
+    if (PHP_OS=="WINNT") $fullPath = "start /B "."$fullPath"." 2>&1";
+
+    error_reporting(E_ALL);
+    $handle = popen($fullPath, 'r');
+
+    if ($echo){
+        echo "<pre>";
+        echo $fullPath."<br>";
+        $read = stream_get_contents($handle);
+        echo $read;
+        pclose($handle);
+        echo "</pre>";
+        return $read;
+    }
+}
+
 function sort_with_key($array, $sortkey){
     foreach ((array) $array as $key => $value) {
         $sort[$key] = $value[$sortkey];
@@ -198,6 +217,11 @@ error_reporting(E_ALL);
 $config_file ="config.ini";
 $ini_array = parse_ini_file($config_file);
 $DL_DIR=$ini_array["download_dir"];
-$PY_PATH=$ini_array["python_path"]
+$PY_PATH=$ini_array["python_path"];
+$DEBUG_FLAG_=$ini_array["debug_flag"];
+$JOB_FILE=$ini_array["job_file"];
+$JOB_ARRAY = (file_exists($JOB_FILE))? json_decode(file_get_contents($JOB_FILE),true) : array();
+$JOB_NUM = count($JOB_ARRAY);
+
 ?>
 

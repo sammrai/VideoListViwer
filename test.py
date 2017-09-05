@@ -1,4 +1,4 @@
-import time,os
+import time,os,sys
 import json
 import signal
 from datetime import datetime
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 	pid =os.getpid()
 
 	state = {"flag" : True,"time":datetime.now().strftime("%Y/%m/%d %H:%M:%S")}
-	jm=jobmng("jobpid")
+	jm=jobmng(sys.argv[1])
 	
 	jm.add_pid(pid,state)
 	# time.sleep(10)

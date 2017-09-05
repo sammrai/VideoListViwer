@@ -44,15 +44,10 @@ $ini = parse_ini_file($config_file, true);
 
 if (!is_empty($_POST)){
 	$ini= array_merge($ini,$_POST);
-	// $ini = var_dump($ini);
-	// print_r($ini);
 	write_php_ini($ini, $config_file);
-
-	// $fp = fopen($config_file, 'w');
-	// foreach ($ini as $k => $i) fputs($fp, "$k=$i\n");
-	// fclose($fp);
 	$save=true;
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -91,6 +86,8 @@ if (!is_empty($_POST)){
 					</nav>
 			</form>
 		</div>
+		<h3> Debug message</h3>
+			<?php echo excutecmd($PY_PATH,"",true);?>
 	</div>
 
 	<?php include("includes/footer.php");?>

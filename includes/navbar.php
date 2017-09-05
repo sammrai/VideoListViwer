@@ -37,7 +37,7 @@ $main_frag = (strpos($_SERVER['SCRIPT_NAME'], 'index.php') !== false);
 		<ul class="nav navbar-nav navbar-left navbar-nav-primary">
 			<li class="<?php echo (get_script_name() =="" )? "active":""; ?>" > <a href=".">Home </a></li>
 			<li class="<?php echo (get_script_name() =="setting.php" )? "active":""; ?>" > <a href="setting.php">Setting</a></li>
-			<li class="<?php echo (get_script_name() =="downloading.php" )? "active":""; ?>" > <a href="downloading.php">Downloading <span class="badge ">2 </span></a></li>
+			<li class="<?php echo (get_script_name() =="downloading.php" )? "active":""; ?>" > <a href="downloading.php">Downloading <span class="badge "> <?php echo $JOB_NUM ?> </span></a></li>
 			<li class="<?php echo (get_script_name() =="ch.php" )? "active":""; ?>" > <a href="ch.php">CH</a></li>
 		</ul>
 		</div>
