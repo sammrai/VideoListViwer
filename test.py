@@ -39,14 +39,14 @@ class jobmng(object):
 
 
 	def kill_process_win(self, pid):
-		if pid_exists(pid):
+		if self.pid_exists(pid):
 			os.kill(pid, signal.SIGTERM)
 			return 0
 		else:
 			return 1
 
 	def kill_process_unix(self, pid):
-		if pid_exists(pid):
+		if self.pid_exists(pid):
 			os.kill(pid, signal.SIGKILL)
 			return 0
 		else:
@@ -54,9 +54,9 @@ class jobmng(object):
 
 	def kill_process(self, pid):
 		pid=int(pid)
-		self.remove_pid(self.file_name,pid,force=True)
-		if os.name=="nt":return kill_process_win(pid)
-		if os.name=="posix":return kill_process_unix(pid)
+		self.remove_pid(pid,force=True)
+		if os.name=="nt":return self.kill_process_win(pid)
+		if os.name=="posix":return self.kill_process_unix(pid)
 
 
 	def load_json(self,):
@@ -79,7 +79,7 @@ class jobmng(object):
 	def killall(self, ):
 		j = self.load_json()
 		for i in j:
-			kill_process(i)
+			self.kill_process(i)
 
 	def add_pid(self,pid,state):	
 		j=self.load_json()
@@ -114,6 +114,6 @@ if __name__ == '__main__':
 	for i in range(6):
 		print i
 		jm.add_pid(pid,{"status":i})
-		time.sleep(1)
+		time.sleep(10)
 
 	jm.remove_pid(pid,force=True)
