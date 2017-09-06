@@ -19,6 +19,12 @@ function write_php_ini($array, $file){
 }
 
 function safefilerewrite($fileName, $dataToSave){    
+	$remote = @fopen ($fileName, "w");
+	if (!$remote) {
+	   // echo "Error: " . $http_response_header[0];
+	   throw new Exception('Failed to open stream: Permission denied. : '.$fileName); 
+	}
+
 	if ($fp = fopen($fileName, 'w'))
     {
         $startTime = microtime(TRUE);
@@ -44,8 +50,13 @@ $ini = parse_ini_file($config_file, true);
 
 if (!is_empty($_POST)){
 	$ini= array_merge($ini,$_POST);
-	write_php_ini($ini, $config_file);
-	$save=true;
+	try{
+		write_php_ini($ini, $config_file);
+		$save="save";
+	} catch (Exception $e){
+	    $err = $e->getMessage();
+	    $save="notopen";
+	}
 }
 
 
@@ -65,7 +76,7 @@ if (!is_empty($_POST)){
 				<strong>Error :</strong> Python path is invarid.
 			</div>
 		<?php endif; ?>
-		<?php if ($save) : ?>
+		<?php if ($save=="save") : ?>
 			<div class="alert alert-success alert-dismissible fade in">
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
@@ -73,6 +84,13 @@ if (!is_empty($_POST)){
 				<strong>
 				<i class="glyphicon glyphicon-ok"></i> Success! :
 				</strong> Settings saved.
+			</div>
+		<?php elseif ($save=="notopen") : ?>
+			<div class="alert alert-danger alert-dismissible fade in">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>Error :</strong> <?php echo $err ?>
 			</div>
 		<?php endif; ?>
 
