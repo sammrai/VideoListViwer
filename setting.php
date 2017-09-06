@@ -57,6 +57,14 @@ if (!is_empty($_POST)){
 	<?php include("includes/navbar.php");?>
 	
 	<div class="container">
+		<?php if ($IS_PY) : ?>
+			<div class="alert alert-danger alert-dismissible fade in">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>Error :</strong> Python path is invarid.
+			</div>
+		<?php endif; ?>
 		<?php if ($save) : ?>
 			<div class="alert alert-success alert-dismissible fade in">
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -87,7 +95,6 @@ if (!is_empty($_POST)){
 			</form>
 		</div>
 		<h3> Debug message</h3>
-			<?php excutecmd($PY_PATH,"",true);?>
 	</div>
 
 	<?php include("includes/footer.php");?>

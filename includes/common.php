@@ -222,6 +222,7 @@ $DEBUG_FLAG_=$ini_array["debug_flag"];
 $JOB_FILE=$ini_array["job_file"];
 $JOB_ARRAY = (file_exists($JOB_FILE))? json_decode(file_get_contents($JOB_FILE),true) : array();
 $JOB_NUM = count($JOB_ARRAY);
+exec($PY_PATH,$_,$IS_PY);
 
 ?>
 

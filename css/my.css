@@ -24,3 +24,7 @@ width: 10em;
 .text-muted{
 	padding: 0px 5px;
 }
+
+.alert{
+	margin: 5px 0px !important;
+}
