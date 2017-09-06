@@ -87,7 +87,7 @@ if (!is_empty($_POST)){
 			</form>
 		</div>
 		<h3> Debug message</h3>
-			<?php echo excutecmd($PY_PATH,"",true);?>
+			<?php excutecmd($PY_PATH,"",true);?>
 	</div>
 
 	<?php include("includes/footer.php");?>
