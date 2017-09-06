@@ -4,7 +4,7 @@
 
 	<div class="col-md-6">
 		<a class="text-muted"><a href="https://github.com/shun-sa/VideoListViwer">Github</a></a>
-		<a class="text-muted"><a href="#" data-toggle="modal" data-target="#myModal">About▾</a></a>
+		<a class="text-muted"><a href="#" data-toggle="modal" data-target="#myModal">About<span class="caret"></span></a></a>
 	</div>
 
 	<div class="col-md-6">
