@@ -94,7 +94,6 @@ if (!is_empty($_POST)){
 					</nav>
 			</form>
 		</div>
-		<h3> Debug message</h3>
 	</div>
 
 	<?php include("includes/footer.php");?>
