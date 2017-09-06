@@ -9,11 +9,11 @@ require "includes/common.php";
 	<body>
 	<?php include("includes/navbar.php");?>
 
-	<div class="container">
+<!-- 	<div class="container">
 		<div class="alert alert-danger">
 		<strong>Error : </strong> This page is under construction.
 		</div>
-	</div>
+	</div> -->
 
 	<div class="container">
 			<form method="POST" action="">
@@ -44,17 +44,12 @@ if (isset($_POST["sub1"])) {
 	        excutecmd($PY_PATH,'kill.py'." ".$JOB_FILE." -a",$DEBUG_FLAG_);
 	        break;
         case "del_cashe":
-// Path relative to where the php file is or absolute server path
-chown($JOB_FILE,465); //Insert an Invalid UserId to set to Nobody Owner; for instance 465
-$do = unlink($JOB_FILE);
-
-if($do=="1"){ 
-    echo "The file was deleted successfully."; 
-} else { echo "There was an error trying to delete the file."; } 
-
-
-	        break;
-        default:  echo "エラー"; exit;
+			$do = unlink($JOB_FILE);
+			if($do=="1"){ 
+			echo "The file was deleted successfully."; 
+			} else { echo "There was an error trying to delete the file."; } 
+			break;
+			default:  echo "エラー"; exit;
 
     }
     sleep(1);
