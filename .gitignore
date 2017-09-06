@@ -1,0 +1,3 @@
+*.job
+*.pyc
+.DS_Store
