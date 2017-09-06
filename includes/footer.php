@@ -4,7 +4,7 @@
 
 	<div class="col-md-6">
 		<a class="text-muted"><a href="https://github.com/shun-sa/VideoListViwer">Github</a></a>
-		<a class="text-muted"><a href="#" data-toggle="modal" data-target="#myModal">About</a></a>
+		<a class="text-muted"><a href="#" data-toggle="modal" data-target="#myModal">About▾</a></a>
 	</div>
 
 	<div class="col-md-6">
@@ -29,7 +29,7 @@
       </div>
       <div class="modal-body">
         <h4 class="modal-title" id="myModalLabel">Dependencies</h4>
-        	Python2.7
+        	Python2.7, 
 
       </div>
 <!--       <div class="modal-footer">
