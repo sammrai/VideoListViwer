@@ -17,3 +17,10 @@ display: inline-block;
 width: 10em;
 }
 
+.row{
+	padding: 30px 0px;
+}
+
+.text-muted{
+	padding: 0px 5px;
+}
